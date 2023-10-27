@@ -3,34 +3,27 @@
 // 2. 라이브러리를 사용하는 방법 - axios
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 
+const SERVER_URL = "http://localhost:4000/api/todo";
 function App() {
   const [todoList, setTodoList] = useState(null);
 
-  const fetchData = () => {
-    fetch("http://localhost:4000/api/todo")
-      .then((response) => response.json())
-      .then((data) => setTodoList(data));
+  const fetchData = async () => {
+    const response = await axios.get(SERVER_URL);
+    setTodoList(response.data);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
     const text = event.target.text.value;
     const done = event.target.done.checked;
-    fetch("http://localhost:4000/api/todo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text,
-        done,
-      }),
-    }).then(() => fetchData());
+    await axios.post(SERVER_URL, { text, done });
+    fetchData();
   };
 
   return (
